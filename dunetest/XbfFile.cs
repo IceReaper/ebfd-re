@@ -1,4 +1,4 @@
-﻿namespace dunetest
+namespace dunetest
 {
 	using System;
 	using System.Collections.Generic;
@@ -72,7 +72,7 @@
 			// TODO identify this
 			if ((flags & 0b0001) != 0)
 				for (var i = 0; i < this.Vertices.Length; i++)
-					reader.ReadInt32();
+					reader.ReadBytes(3);
 
 			// TODO identify this
 			if ((flags & 0b0010) != 0)
@@ -163,28 +163,38 @@
 			{
 				var unk3 = reader.ReadBytes((unk1 + 1) * 64);
 			}
+			else if (unk2 == -2)
+			{
+				var unk3 = reader.ReadBytes((unk1 + 1) * 48);
+			}
 			else if (unk2 == -3)
 			{
-				var unk3 = reader.ReadBytes(374);
+				var unk3 = reader.ReadInt32();
+				var unk4 = reader.ReadBytes((unk1 + 1) * 2);
+
+				for (var i = 0; i < unk3; i++)
+				{
+					var unk5 = reader.ReadBytes(48);
+				}
 			}
-			else
+			else if (unk2 > 0)
 			{
 				for (var i = 0; i < unk2; i++)
 				{
 					var unk3 = reader.ReadInt16();
-					var unk4 = reader.ReadInt16();
+					var unk4 = reader.ReadInt16() >> 12;
 
-					if (unk4 == 0x7000)
+					if ((unk4 & 0b001) != 0)
 					{
-						var unk5 = reader.ReadBytes(40);
+						var unk5 = reader.ReadBytes(16);
 					}
-					else if (unk4 == 0x4000)
+					if ((unk4 & 0b010) != 0)
 					{
 						var unk5 = reader.ReadBytes(12);
 					}
-					else
+					if ((unk4 & 0b100) != 0)
 					{
-						Console.WriteLine("BREAK");
+						var unk5 = reader.ReadBytes(12);
 					}
 				}
 			}

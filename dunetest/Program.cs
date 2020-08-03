@@ -1,4 +1,4 @@
-﻿namespace dunetest
+namespace dunetest
 {
 	using System.IO;
 	using System.IO.Compression;
@@ -140,12 +140,12 @@
 					writer.Write(Encoding.ASCII.GetBytes("WAVE"));
 					writer.Write(Encoding.ASCII.GetBytes("fmt "));
 					writer.Write(16);
-					writer.Write((short) 1);
-					writer.Write((short) (isStereo ? 2 : 1));
+					writer.Write((short)1);
+					writer.Write((short)(isStereo ? 2 : 1));
 					writer.Write(sampleRate);
 					writer.Write(sampleRate * (is16Bit ? 2 : 1) * (isStereo ? 2 : 1));
-					writer.Write((short) (is16Bit ? 2 : 1));
-					writer.Write((short) (is16Bit ? 16 : 8));
+					writer.Write((short)(is16Bit ? 2 : 1));
+					writer.Write((short)(is16Bit ? 16 : 8));
 					writer.Write(Encoding.ASCII.GetBytes("data"));
 					writer.Write(length * (isCompressed ? 4 : 1));
 
@@ -158,8 +158,8 @@
 							var compressed = reader.ReadByte();
 
 							// TODO sound is properly decompressed but has continuous noise.
-							writer.Write((short) (((compressed >> 4) & 0b1111) * formatFlags));
-							writer.Write((short) (((compressed >> 0) & 0b1111) * formatFlags));
+							writer.Write((short)(((compressed >> 4) & 0b1111) * formatFlags));
+							writer.Write((short)(((compressed >> 0) & 0b1111) * formatFlags));
 						}
 					}
 					else
