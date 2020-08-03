@@ -29,7 +29,6 @@ namespace dunetest
 					break;
 
 				reader.BaseStream.Position -= 4;
-
 				this.Objects.Add(new XbfObject(reader));
 			}
 		}
@@ -147,7 +146,6 @@ namespace dunetest
 	{
 		public XbfVertexAnimation(BinaryReader reader)
 		{
-			// TODO fix this!
 			// TODO implement those!
 			var unk1 = reader.ReadInt32();
 			var unk2 = reader.ReadInt32();
@@ -157,8 +155,12 @@ namespace dunetest
 			{
 				var unk4 = reader.ReadInt32();
 			}
-			
-			//TODO there is more here...
+
+			var unk5 = reader.ReadInt32();
+			var unk6 = reader.ReadInt32();
+			// TODO this is not fully correct yet!
+			var unk7 = reader.ReadBytes(unk3 * 208);
+			var unk8 = reader.ReadBytes(unk3 * 8 - 4);
 		}
 	}
 
@@ -193,19 +195,19 @@ namespace dunetest
 				for (var i = 0; i < unk2; i++)
 				{
 					var unk3 = reader.ReadInt16();
-					var unk4 = reader.ReadInt16() >> 12;
+					var unk4 = reader.ReadInt16();
 
-					if ((unk4 & 0b001) != 0)
+					if (((unk4 >> 12) & 0b001) != 0)
 					{
 						var unk5 = reader.ReadBytes(16);
 					}
 
-					if ((unk4 & 0b010) != 0)
+					if (((unk4 >> 12) & 0b010) != 0)
 					{
 						var unk5 = reader.ReadBytes(12);
 					}
 
-					if ((unk4 & 0b100) != 0)
+					if (((unk4 >> 12) & 0b100) != 0)
 					{
 						var unk5 = reader.ReadBytes(12);
 					}
