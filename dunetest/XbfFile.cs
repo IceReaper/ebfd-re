@@ -10,7 +10,7 @@ namespace dunetest
 		public byte[] Temp;
 		public XbfHeader Header;
 		public IEnumerable<string> Textures;
-		public XbfObject Object;
+		public List<XbfObject> Objects = new List<XbfObject>();
 
 		public XbfFile(byte[] bytes)
 		{
@@ -20,7 +20,18 @@ namespace dunetest
 
 			this.Header = new XbfHeader(reader);
 			this.Textures = new string(reader.ReadChars(reader.ReadInt32())).Split('\0').Where(s => s != "").ToArray();
-			this.Object = new XbfObject(reader);
+
+			while (true)
+			{
+				var test = reader.ReadInt32();
+
+				if (test == -1)
+					break;
+
+				reader.BaseStream.Position -= 4;
+
+				this.Objects.Add(new XbfObject(reader));
+			}
 		}
 	}
 
@@ -32,7 +43,7 @@ namespace dunetest
 		{
 			this.Version = reader.ReadInt32();
 
-			// TODO parse the header!
+			// TODO parse the header! (but it seems the data is not required at all...?)
 			var unk1Size = reader.ReadInt32();
 			reader.BaseStream.Position += unk1Size;
 		}
@@ -188,10 +199,12 @@ namespace dunetest
 					{
 						var unk5 = reader.ReadBytes(16);
 					}
+
 					if ((unk4 & 0b010) != 0)
 					{
 						var unk5 = reader.ReadBytes(12);
 					}
+
 					if ((unk4 & 0b100) != 0)
 					{
 						var unk5 = reader.ReadBytes(12);
