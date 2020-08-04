@@ -8,4 +8,4 @@ The current state of the project is:
 - Maps: Unimplemented
 - Missions: Unimplemented
 - Fonts: Unimplemented
-- Models: Mostly working. The VertexAnimation part is unfinished.
+- Models: All data is parsed. Some values however need to be determined.
