@@ -1,5 +1,6 @@
-namespace dunetest
+namespace EbfdExtractor
 {
+	using System;
 	using System.IO;
 	using System.IO.Compression;
 	using System.Text;
@@ -36,12 +37,17 @@ namespace dunetest
 			while (headerReader.BaseStream.Position < headerReader.BaseStream.Length)
 			{
 				var nameLength = headerReader.ReadInt32();
-				var dateTime = headerReader.ReadInt32();
-				var isCompressed = headerReader.ReadInt32() == 2;
+				headerReader.ReadInt32(); // dateTime
+				var flags = headerReader.ReadInt32();
 				var compressedSize = headerReader.ReadInt32();
 				var uncompressedSize = headerReader.ReadInt32();
 				var offset = headerReader.ReadInt32();
 				var name = new string(headerReader.ReadChars(nameLength)).Split('\0')[0];
+
+				if ((flags & 0b11111111111111111111111111111101) != 0)
+					throw new Exception("Unknown flags!");
+
+				var isCompressed = (flags & 0b10) != 0;
 
 				dataReader.BaseStream.Position = offset + 6;
 				byte[] bytes;
@@ -91,16 +97,32 @@ namespace dunetest
 				{
 					// TODO Map.??? shows terrain in hex editor
 				}
+				else if (type == "XAF")
+				{
+					// Developer leftover uncompiled XBF
+				}
+				else if (type == "BAK")
+				{
+					// Developer leftover file backup
+				}
+				else
+					throw new Exception("Unknown type!");
 			}
 		}
 
 		private static void ExtractBag(string path)
 		{
 			using var reader = new BinaryReader(File.OpenRead(path));
-			var magic = reader.ReadChars(4); // GABA => A BAG
-			var version = reader.ReadInt32(); // 4
+			var magic = new string(reader.ReadChars(4));
+			var version = reader.ReadInt32();
 			var numSounds = reader.ReadInt32();
 			var stride = reader.ReadInt32();
+
+			if (magic != "GABA")
+				throw new Exception("Invalid magic!");
+
+			if (version != 4)
+				throw new Exception("Unknown version!");
 
 			for (var i = 0; i < numSounds; i++)
 			{
@@ -112,6 +134,9 @@ namespace dunetest
 				var sampleRate = reader.ReadInt32();
 				var flags = reader.ReadInt32();
 				var formatFlags = reader.ReadInt32();
+
+				if ((flags & 0b11111111111111111111111111000000) != 0)
+					throw new Exception("Unknown flags!");
 
 				var isStereo = (flags & 0b000001) != 0;
 				var isUncompressed = (flags & 0b000010) != 0;
@@ -140,12 +165,12 @@ namespace dunetest
 					writer.Write(Encoding.ASCII.GetBytes("WAVE"));
 					writer.Write(Encoding.ASCII.GetBytes("fmt "));
 					writer.Write(16);
-					writer.Write((short)1);
-					writer.Write((short)(isStereo ? 2 : 1));
+					writer.Write((short) 1);
+					writer.Write((short) (isStereo ? 2 : 1));
 					writer.Write(sampleRate);
 					writer.Write(sampleRate * (is16Bit ? 2 : 1) * (isStereo ? 2 : 1));
-					writer.Write((short)(is16Bit ? 2 : 1));
-					writer.Write((short)(is16Bit ? 16 : 8));
+					writer.Write((short) (is16Bit ? 2 : 1));
+					writer.Write((short) (is16Bit ? 16 : 8));
 					writer.Write(Encoding.ASCII.GetBytes("data"));
 					writer.Write(length * (isCompressed ? 4 : 1));
 
@@ -158,12 +183,14 @@ namespace dunetest
 							var compressed = reader.ReadByte();
 
 							// TODO sound is properly decompressed but has continuous noise.
-							writer.Write((short)(((compressed >> 4) & 0b1111) * formatFlags));
-							writer.Write((short)(((compressed >> 0) & 0b1111) * formatFlags));
+							writer.Write((short) (((compressed >> 4) & 0b1111) * formatFlags));
+							writer.Write((short) (((compressed >> 0) & 0b1111) * formatFlags));
 						}
 					}
-					else
+					else if (isUncompressed)
 						writer.Write(reader.ReadBytes(length));
+					else
+						throw new Exception("Unknown flags combination!");
 
 					reader.BaseStream.Position = start + stride;
 

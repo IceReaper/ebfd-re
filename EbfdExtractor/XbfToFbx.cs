@@ -1,4 +1,4 @@
-﻿namespace dunetest
+﻿namespace EbfdExtractor
 {
 	public static class XbfToFbx
 	{

@@ -1,4 +1,4 @@
-namespace dunetest
+namespace EbfdExtractor
 {
 	using System;
 	using System.Collections.Generic;
@@ -31,6 +31,9 @@ namespace dunetest
 				reader.BaseStream.Position -= 4;
 				this.Objects.Add(new XbfObject(reader));
 			}
+
+			if (reader.BaseStream.Position != reader.BaseStream.Length)
+				throw new Exception("Missing data!");
 		}
 	}
 
@@ -41,6 +44,9 @@ namespace dunetest
 		public XbfHeader(BinaryReader reader)
 		{
 			this.Version = reader.ReadInt32();
+
+			if (this.Version != 1)
+				throw new Exception("Unknown version!");
 
 			// TODO parse the header! (but it seems the data is not required at all...?)
 			var unk1Size = reader.ReadInt32();
@@ -94,6 +100,9 @@ namespace dunetest
 
 			if ((flags & 0b1000) != 0)
 				this.KeyAnimation = new XbfKeyAnimation(reader);
+
+			if (flags >> 4 != 0)
+				throw new Exception("Unknown flags!");
 		}
 	}
 
@@ -156,11 +165,25 @@ namespace dunetest
 				var unk4 = reader.ReadInt32();
 			}
 
-			var unk5 = reader.ReadInt32();
+			if (unk2 >= 0)
+				return;
+
+			var unk5 = reader.ReadInt16();
+			var flags = reader.ReadUInt16();
 			var unk6 = reader.ReadInt32();
-			// TODO this is not fully correct yet!
-			var unk7 = reader.ReadBytes(unk3 * 208);
-			var unk8 = reader.ReadBytes(unk3 * 8 - 4);
+
+			if ((flags & 0b0111111111111111) != 0)
+				throw new Exception("Unknown flags!");
+
+			if (-unk2 != unk6)
+				throw new Exception("-unk2 and unk6 differ!");
+
+			var unk7 = reader.ReadBytes(unk6 * 8);
+
+			if (((flags >> 12) & 0b1000) != 0)
+			{
+				var unk8 = reader.ReadBytes(unk1 * 4);
+			}
 		}
 	}
 
@@ -190,27 +213,30 @@ namespace dunetest
 					var unk5 = reader.ReadBytes(48);
 				}
 			}
-			else if (unk2 > 0)
+			else
 			{
 				for (var i = 0; i < unk2; i++)
 				{
 					var unk3 = reader.ReadInt16();
-					var unk4 = reader.ReadInt16();
+					var flags = reader.ReadInt16();
 
-					if (((unk4 >> 12) & 0b001) != 0)
+					if (((flags >> 12) & 0b001) != 0)
 					{
-						var unk5 = reader.ReadBytes(16);
+						var unk4 = reader.ReadBytes(16);
 					}
 
-					if (((unk4 >> 12) & 0b010) != 0)
-					{
-						var unk5 = reader.ReadBytes(12);
-					}
-
-					if (((unk4 >> 12) & 0b100) != 0)
+					if (((flags >> 12) & 0b010) != 0)
 					{
 						var unk5 = reader.ReadBytes(12);
 					}
+
+					if (((flags >> 12) & 0b100) != 0)
+					{
+						var unk6 = reader.ReadBytes(12);
+					}
+
+					if ((flags & 0b1000111111111111) != 0)
+						throw new Exception("Unknown flags!");
 				}
 			}
 		}
