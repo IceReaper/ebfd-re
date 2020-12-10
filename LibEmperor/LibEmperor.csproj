@@ -3,11 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <EnableNullable>true</EnableNullable>
-        <OutputType>Exe</OutputType>
     </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\LibEmperor\LibEmperor.csproj" />
-    </ItemGroup>
 
 </Project>
