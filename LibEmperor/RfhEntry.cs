@@ -40,13 +40,12 @@ namespace LibEmperor
 		public byte[] Read()
 		{
 			this.reader.BaseStream.Position = this.offset + 6;
-			byte[] bytes;
 
 			if ((this.flags & Flags.Compressed) == 0)
 				return this.reader.ReadBytes(this.compressedSize);
 
 			var deflateStream = new DeflateStream(this.reader.BaseStream, CompressionMode.Decompress);
-			bytes = new byte[this.uncompressedSize];
+			byte[] bytes = new byte[this.uncompressedSize];
 			deflateStream.Read(bytes);
 
 			return bytes;

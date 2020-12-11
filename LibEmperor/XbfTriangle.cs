@@ -7,6 +7,7 @@ namespace LibEmperor
 		public readonly int Vertex1;
 		public readonly int Vertex2;
 		public readonly int Vertex3;
+		public readonly int Texture;
 		public readonly float U1;
 		public readonly float V1;
 		public readonly float U2;
@@ -20,8 +21,9 @@ namespace LibEmperor
 			this.Vertex2 = reader.ReadInt32();
 			this.Vertex3 = reader.ReadInt32();
 
-			// TODO implement those!
-			var unk1 = reader.ReadInt32(); // texture?
+			this.Texture = reader.ReadInt32();
+
+			// TODO implement this!
 			var unk2 = reader.ReadInt32(); // smoothing?
 
 			this.U1 = reader.ReadSingle();

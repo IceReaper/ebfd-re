@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="OpenTK" Version="4.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\LibEmperor\LibEmperor.csproj" />
     </ItemGroup>
 

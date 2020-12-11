@@ -59,7 +59,7 @@ namespace LibEmperor
 			var compressed = (this.flags & Flags.Compressed) != 0;
 			var uncompressed = (this.flags & Flags.Uncompressed) != 0;
 
-			if ((compressed && uncompressed) || (!compressed && !uncompressed))
+			if (compressed && uncompressed || !compressed && !uncompressed)
 				throw new Exception("Unknown flags combination!");
 
 			using var stream = new MemoryStream();

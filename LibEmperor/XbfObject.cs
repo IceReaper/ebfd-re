@@ -15,7 +15,7 @@ namespace LibEmperor
 		}
 
 		public readonly XbfVertex[] Vertices;
-		public readonly XbfTriangle[] Faces;
+		public readonly XbfTriangle[] Triangles;
 		public readonly XbfObject[] Children;
 		public readonly double[] Transform = new double[4 * 4];
 		public readonly string Name;
@@ -31,7 +31,7 @@ namespace LibEmperor
 			if ((int) flags >> 4 != 0)
 				throw new Exception("Unknown flags!");
 
-			this.Faces = new XbfTriangle[reader.ReadInt32()];
+			this.Triangles = new XbfTriangle[reader.ReadInt32()];
 			this.Children = new XbfObject[reader.ReadInt32()];
 
 			for (var i = 0; i < this.Transform.Length; i++)
@@ -45,8 +45,8 @@ namespace LibEmperor
 			for (var i = 0; i < this.Vertices.Length; i++)
 				this.Vertices[i] = new XbfVertex(reader);
 
-			for (var i = 0; i < this.Faces.Length; i++)
-				this.Faces[i] = new XbfTriangle(reader);
+			for (var i = 0; i < this.Triangles.Length; i++)
+				this.Triangles[i] = new XbfTriangle(reader);
 
 			// TODO identify this
 			if ((flags & Flags.Unk1) != 0)
@@ -55,7 +55,7 @@ namespace LibEmperor
 
 			// TODO identify this
 			if ((flags & Flags.Unk2) != 0)
-				for (var i = 0; i < this.Faces.Length; i++)
+				for (var i = 0; i < this.Triangles.Length; i++)
 					reader.ReadInt32();
 
 			if ((flags & Flags.VertexAnimation) != 0)

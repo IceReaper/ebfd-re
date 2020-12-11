@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <EnableNullable>true</EnableNullable>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
 </Project>
