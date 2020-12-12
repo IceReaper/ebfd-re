@@ -10,9 +10,9 @@ namespace LibEmperor
 		public readonly IEnumerable<string> Textures;
 		public readonly List<XbfObject> Objects = new();
 
-		public Xbf(byte[] bytes)
+		public Xbf(Stream stream)
 		{
-			using var reader = new BinaryReader(new MemoryStream(bytes));
+			using var reader = new BinaryReader(stream);
 
 			var version = reader.ReadInt32();
 

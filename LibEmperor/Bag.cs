@@ -4,12 +4,15 @@ namespace LibEmperor
 	using System.Collections.Generic;
 	using System.IO;
 
-	public class Bag
+	public class Bag : IDisposable
 	{
+		private readonly Stream stream;
+
 		public readonly List<BagEntry> Files = new();
 
 		public Bag(Stream stream)
 		{
+			this.stream = stream;
 			var reader = new BinaryReader(stream);
 
 			var magic = new string(reader.ReadChars(4));
@@ -31,6 +34,12 @@ namespace LibEmperor
 				reader.BaseStream.Position = start + i * stride;
 				this.Files.Add(new BagEntry(reader));
 			}
+		}
+
+		public void Dispose()
+		{
+			this.stream.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 namespace XbfViewer
 {
 	using Cameras;
+	using FileSystem;
 	using Graphics;
 	using Graphics.Mesh;
 	using Graphics.Vertices;
@@ -9,17 +10,21 @@ namespace XbfViewer
 	using OpenTK.Mathematics;
 	using OpenTK.Windowing.Common;
 	using OpenTK.Windowing.Desktop;
+	using OpenTK.Windowing.GraphicsLibraryFramework;
+	using System;
 	using System.Collections.Generic;
-	using System.IO;
 	using System.Linq;
 	using Xbf;
 
 	public class Application : GameWindow
 	{
+		private VirtualFileSystem fileSystem;
+		private List<string> models;
 		private XbfShader shader;
-		private Mesh mesh;
-		private MeshInstance meshInstance;
 		private Camera camera;
+		private string? model;
+		private Mesh? mesh;
+		private MeshInstance? meshInstance;
 
 		public Application()
 			: base(GameWindowSettings.Default, NativeWindowSettings.Default)
@@ -31,11 +36,26 @@ namespace XbfViewer
 			GL.ClearColor(0, 0, 0, 1);
 			GL.Enable(EnableCap.DepthTest);
 
-			this.shader = new XbfShader();
+			this.fileSystem = new VirtualFileSystem();
+			this.fileSystem.Add(new FolderFileSystem("C:/Westwood/Emperor"));
 
-			// TODO implement filesystem!
-			this.mesh = this.LoadXbf("3DDATA0001", "Buildings/OR_Palace_H0");
-			this.meshInstance = new MeshInstance(this.mesh);
+			foreach (var file in this.fileSystem.GetFiles())
+			{
+				if (file.EndsWith(".RFH", StringComparison.OrdinalIgnoreCase))
+					this.fileSystem.Add(
+						new RfhFileSystem(new Rfh(this.fileSystem.Read(file)!, this.fileSystem.Read(file.Substring(0, file.Length - 1) + "D")!))
+					);
+				else if (file.EndsWith(".BAG", StringComparison.OrdinalIgnoreCase))
+					this.fileSystem.Add(new BagFileSystem(new Bag(this.fileSystem.Read(file)!)));
+			}
+
+			this.models = new List<string>();
+
+			foreach (var file in this.fileSystem.GetFiles())
+				if (file.EndsWith(".XBF", StringComparison.OrdinalIgnoreCase))
+					this.models.Add(file);
+
+			this.shader = new XbfShader();
 
 			this.camera = new PerspectiveCamera
 			{
@@ -43,11 +63,22 @@ namespace XbfViewer
 			};
 		}
 
-		private Mesh LoadXbf(string dataFolder, string file)
+		private void LoadXbf(string model)
 		{
-			var xbf = new LibEmperor.Xbf(File.ReadAllBytes(Path.Combine(dataFolder, file + ".xbf")));
+			this.mesh?.Dispose();
+			this.mesh = null;
+			this.meshInstance = null;
 
-			return new Mesh(
+			var stream = this.fileSystem.Read(model);
+
+			if (stream == null)
+				return;
+
+			var xbf = new LibEmperor.Xbf(stream);
+
+			this.model = model;
+
+			this.mesh = new Mesh(
 				null,
 				Matrix4.Identity,
 				xbf.Objects.Select(
@@ -64,7 +95,13 @@ namespace XbfViewer
 										GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (uint) TextureMagFilter.Linear);
 										GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 
-										var tga = new Tga(File.ReadAllBytes(Path.Combine(dataFolder, $"Textures/{name}")));
+										var stream = this.fileSystem.Read($"Textures/{name}");
+
+										// TODO this happens sometimes.. but why?
+										if (stream == null)
+											return texture;
+
+										var tga = new Tga(stream);
 
 										GL.TexImage2D(
 											TextureTarget.Texture2D,
@@ -88,6 +125,8 @@ namespace XbfViewer
 				null,
 				null
 			);
+
+			this.meshInstance = new MeshInstance(this.mesh);
 		}
 
 		private Mesh LoadXbfObject(XbfObject xbfObject, IReadOnlyList<int> textures)
@@ -197,7 +236,16 @@ namespace XbfViewer
 
 		protected override void OnUpdateFrame(FrameEventArgs args)
 		{
-			this.meshInstance.World *= Matrix4.CreateRotationY((float) args.Time);
+			if (this.meshInstance != null)
+				this.meshInstance.World *= Matrix4.CreateRotationY((float) args.Time);
+
+			if (this.KeyboardState.IsKeyPressed(Keys.Enter) || this.model == null)
+			{
+				var index = this.model == null ? 0 : (this.models.IndexOf(this.model) + 1) % this.models.Count;
+				var model = this.models[index];
+				Console.WriteLine($"{index} / {this.models.Count} => {model}");
+				this.LoadXbf(model);
+			}
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs args)
@@ -206,7 +254,7 @@ namespace XbfViewer
 
 			this.camera.Update();
 
-			this.meshInstance.Draw(this.camera);
+			this.meshInstance?.Draw(this.camera);
 
 			this.Context.SwapBuffers();
 		}

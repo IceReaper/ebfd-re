@@ -9,9 +9,9 @@ namespace LibEmperor
 		public readonly ushort Height;
 		public readonly byte[] Pixels;
 
-		public Tga(byte[] bytes)
+		public Tga(Stream stream)
 		{
-			using var reader = new BinaryReader(new MemoryStream(bytes));
+			using var reader = new BinaryReader(stream);
 
 			if (reader.ReadByte() != 0x00)
 				throw new Exception("Unsupported IDLength");
@@ -19,7 +19,19 @@ namespace LibEmperor
 			if (reader.ReadByte() != 0x00)
 				throw new Exception("Unsupported ColorMapType");
 
-			if (reader.ReadByte() != 0x02)
+			var imageType = reader.ReadByte();
+
+			// TODO fix those!
+			if (imageType == 0x00)
+			{
+				this.Width = 1;
+				this.Height = 1;
+				this.Pixels = new byte [] {0xff, 0x00, 0x00, 0xff};
+
+				return;
+			}
+
+			if (imageType != 0x02)
 				throw new Exception("Unsupported ImageType");
 
 			if (reader.ReadUInt16() != 0x0000)

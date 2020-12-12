@@ -1,5 +1,6 @@
 namespace LibEmperor
 {
+	using System;
 	using System.IO;
 
 	public class XbfTriangle
@@ -24,7 +25,7 @@ namespace LibEmperor
 			this.Texture = reader.ReadInt32();
 
 			// TODO implement this!
-			var unk2 = reader.ReadInt32(); // smoothing?
+			var unk2 = reader.ReadInt32(); // smoothing? // bitmask?
 
 			this.U1 = reader.ReadSingle();
 			this.V1 = reader.ReadSingle();

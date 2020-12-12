@@ -23,7 +23,7 @@ namespace EbfdExtractor
 			{
 				var outPath = file.Substring(0, file.Length - 4);
 
-				if (file.ToUpper().EndsWith(".RFH"))
+				if (file.EndsWith(".RFH", StringComparison.OrdinalIgnoreCase))
 				{
 					var rfh = new Rfh(File.OpenRead(file), File.OpenRead(file.Substring(0, file.Length - 1) + (file.EndsWith("H") ? "D" : "d")));
 
@@ -77,7 +77,7 @@ namespace EbfdExtractor
 							throw new Exception("Unknown type!");
 					}
 				}
-				else if (file.ToUpper().EndsWith(".BAG"))
+				else if (file.EndsWith(".BAG", StringComparison.OrdinalIgnoreCase))
 				{
 					var bag = new Bag(File.OpenRead(file));
 

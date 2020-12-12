@@ -58,5 +58,20 @@
 			foreach (var child in this.children)
 				child.Draw(camera, model);
 		}
+
+		public void Dispose()
+		{
+			GL.DeleteBuffer(this.vertexArrayObject);
+			GL.DeleteBuffer(this.indexBufferObject);
+			GL.DeleteBuffer(this.vertexBufferObject);
+
+			this.shaderParameters?.Dispose();
+
+			if (this.children == null)
+				return;
+
+			foreach (var child in this.children)
+				child.Dispose();
+		}
 	}
 }
