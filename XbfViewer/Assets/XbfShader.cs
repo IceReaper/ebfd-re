@@ -1,11 +1,22 @@
-﻿namespace XbfViewer.Xbf
+﻿namespace XbfViewer.Assets
 {
+	using FileSystem;
 	using Graphics.Shaders;
 	using OpenTK.Graphics.OpenGL4;
 	using OpenTK.Mathematics;
 
-	public class XbfShader : Shader<XbfShaderParameters>
+	public class XbfShader : Shader<XbfShader.XbfShaderParameters>
 	{
+		public class XbfShaderParameters : ShaderParameters<XbfShader>
+		{
+			public int Texture;
+
+			public XbfShaderParameters(XbfShader shader)
+				: base(shader)
+			{
+			}
+		}
+
 		// language=GLSL
 		private const string VertexShader = @"
 			#version 300 es
@@ -52,7 +63,7 @@
 		private readonly int vertexNormal;
 		private readonly int vertexUv;
 
-		public XbfShader()
+		public XbfShader(AssetManager assetManager, IReadableFileSystem fileSystem, string path)
 			: base(XbfShader.VertexShader, XbfShader.FragmentShader)
 		{
 			this.vertexPosition = GL.GetAttribLocation(this.Program, "aPosition");

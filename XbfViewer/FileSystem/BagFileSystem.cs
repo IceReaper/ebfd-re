@@ -19,13 +19,13 @@ namespace XbfViewer.FileSystem
 		{
 			var bagPath = path.Replace('/', '\\');
 
-			return this.bag.Files.Any(bagEntry => bagEntry.Path == bagPath);
+			return this.bag.Files.Any(bagEntry => string.Equals(bagEntry.Path, bagPath, StringComparison.OrdinalIgnoreCase));
 		}
 
 		public Stream? Read(string path)
 		{
 			var bagPath = path.Replace('/', '\\');
-			var entry = this.bag.Files.FirstOrDefault(bagEntry => bagEntry.Path == bagPath);
+			var entry = this.bag.Files.FirstOrDefault(bagEntry => string.Equals(bagEntry.Path, bagPath, StringComparison.OrdinalIgnoreCase));
 
 			return entry != null ? new MemoryStream(entry.Read()) : null;
 		}
@@ -34,7 +34,8 @@ namespace XbfViewer.FileSystem
 		{
 			var bagPath = path.Replace('/', '\\');
 
-			return this.bag.Files.Where(bagEntry => bagEntry.Path.StartsWith(bagPath)).Select(bagEntry => bagEntry.Path.Replace('\\', '/').Trim('/'));
+			return this.bag.Files.Where(bagEntry => bagEntry.Path.StartsWith(bagPath, StringComparison.OrdinalIgnoreCase))
+				.Select(bagEntry => bagEntry.Path.Replace('\\', '/').Trim('/'));
 		}
 
 		public void Dispose()

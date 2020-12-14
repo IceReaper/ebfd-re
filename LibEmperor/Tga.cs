@@ -26,7 +26,7 @@ namespace LibEmperor
 			{
 				this.Width = 1;
 				this.Height = 1;
-				this.Pixels = new byte [] {0xff, 0x00, 0x00, 0xff};
+				this.Pixels = new byte[] {0xff, 0x00, 0x00, 0xff};
 
 				return;
 			}

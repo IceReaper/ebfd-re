@@ -48,7 +48,9 @@ namespace LibEmperor
 			for (var i = 0; i < this.Triangles.Length; i++)
 				this.Triangles[i] = new XbfTriangle(reader);
 
-			// TODO identify this 0,0,0 255,255,255, ... ? Vertex colors?
+			// TODO This could be AmbientLight. However, its always 255,255,255 and only present on these two files:
+			// FRONTEND/arrowhighlight.xbf
+			// FRONTEND/SCORE.XBF
 			if ((flags & Flags.Unk1) != 0)
 				for (var i = 0; i < this.Vertices.Length; i++)
 					reader.ReadBytes(3);

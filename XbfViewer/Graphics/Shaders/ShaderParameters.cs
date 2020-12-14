@@ -14,7 +14,5 @@ namespace XbfViewer.Graphics.Shaders
 		public int CreateVertexArrayObject() => this.shader.CreateVertexArrayObject();
 
 		public void Bind(Matrix4 model, Matrix4 view, Matrix4 projection) => this.shader.Bind(model, view, projection, this);
-		
-		public abstract void Dispose();
 	}
 }
