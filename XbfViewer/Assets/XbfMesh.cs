@@ -42,25 +42,6 @@ namespace XbfViewer.Assets
 
 		private static Mesh LoadXbfObject(XbfObject xbfObject, XbfShader shader, IReadOnlyList<int> textures)
 		{
-			var transform = new Matrix4(
-				(float) xbfObject.Transform[0],
-				(float) xbfObject.Transform[1],
-				(float) xbfObject.Transform[2],
-				(float) xbfObject.Transform[3],
-				(float) xbfObject.Transform[4],
-				(float) xbfObject.Transform[5],
-				(float) xbfObject.Transform[6],
-				(float) xbfObject.Transform[7],
-				(float) xbfObject.Transform[8],
-				(float) xbfObject.Transform[9],
-				(float) xbfObject.Transform[10],
-				(float) xbfObject.Transform[11],
-				(float) xbfObject.Transform[12],
-				(float) xbfObject.Transform[13],
-				(float) xbfObject.Transform[14],
-				(float) xbfObject.Transform[15]
-			);
-
 			var allVertices = new Dictionary<int, List<VertexPositionNormalUv>>();
 			var allIndices = new Dictionary<int, List<ShaderIndex>>();
 
@@ -117,27 +98,65 @@ namespace XbfViewer.Assets
 				indices.Add(new ShaderIndex(vertices.Count - 3, vertices.Count - 2, vertices.Count - 1));
 			}
 
-			return new Mesh(
-				xbfObject.Name,
-				new XbfShader.XbfShaderParameters(shader),
-				transform,
-				allVertices.Keys.Select(
-						texture =>
-						{
-							return new Mesh(
-								"",
-								new XbfShader.XbfShaderParameters(shader) {Texture = textures[texture]},
-								Matrix4.Identity,
-								null,
-								allVertices[texture].Select(vertex => vertex.Pack()).SelectMany(v => v).ToArray(),
-								allIndices[texture].Select(index => new[] {index.I1, index.I2, index.I3}).SelectMany(i => i).ToArray()
-							);
-						}
+			return new Mesh(null, null, null)
+			{
+				Name = xbfObject.Name,
+				Transform = XbfMesh.BuildMatrix(xbfObject.Transform),
+				TransformAnimation = xbfObject.KeyAnimation?.Animation.Select(XbfMesh.BuildMatrix).ToArray(),
+				Children = allVertices.Keys
+					.Select(
+						texture => new Mesh(
+							new XbfShader.XbfShaderParameters(shader) {Texture = textures[texture]},
+							allVertices[texture].Select(vertex => vertex.Pack()).SelectMany(v => v).ToArray(),
+							allIndices[texture].Select(index => new[] {index.I1, index.I2, index.I3}).SelectMany(i => i).ToArray()
+						)
 					)
 					.Concat(xbfObject.Children.Select(childXbfObject => XbfMesh.LoadXbfObject(childXbfObject, shader, textures)))
 					.ToArray(),
-				null,
-				null
+			};
+		}
+
+		private static Matrix4 BuildMatrix(double[] values)
+		{
+			return new(
+				(float) values[0],
+				(float) values[1],
+				(float) values[2],
+				(float) values[3],
+				(float) values[4],
+				(float) values[5],
+				(float) values[6],
+				(float) values[7],
+				(float) values[8],
+				(float) values[9],
+				(float) values[10],
+				(float) values[11],
+				(float) values[12],
+				(float) values[13],
+				(float) values[14],
+				(float) values[15]
+			);
+		}
+
+		private static Matrix4 BuildMatrix(float[] values)
+		{
+			return new(
+				values[0],
+				values[1],
+				values[2],
+				values[3],
+				values[4],
+				values[5],
+				values[6],
+				values[7],
+				values[8],
+				values[9],
+				values[10],
+				values[11],
+				values[12],
+				values[13],
+				values[14],
+				values[15]
 			);
 		}
 

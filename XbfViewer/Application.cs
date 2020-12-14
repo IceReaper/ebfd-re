@@ -68,7 +68,10 @@ namespace XbfViewer
 		protected override void OnUpdateFrame(FrameEventArgs args)
 		{
 			if (this.meshInstance != null)
-				this.meshInstance.World *= Matrix4.CreateRotationY((float) args.Time);
+			{
+				this.meshInstance.World *= Matrix4.CreateRotationY((float) args.Time / 5);
+				this.meshInstance.Update(args.Time);
+			}
 
 			if (this.KeyboardState.IsKeyPressed(Keys.Enter) || this.model == null)
 				this.LoadXbf(this.models[this.model == null ? 0 : (this.models.IndexOf(this.model) + 1) % this.models.Count]);
@@ -83,7 +86,7 @@ namespace XbfViewer
 
 			this.mesh = this.assetManager.Load<XbfMesh>(this, model);
 
-			this.meshInstance = new MeshInstance(this.mesh);
+			this.meshInstance = new MeshInstance(this.mesh) {Speed = 20};
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs args)

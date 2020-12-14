@@ -8,11 +8,12 @@
 
 	public class Mesh : IDisposable
 	{
-		public string Name { get; protected set; }
+		public string Name;
+		public Matrix4? Transform;
+		public Matrix4[]? TransformAnimation;
+		public Mesh[]? Children;
 
 		protected IShaderParameters? ShaderParameters;
-		protected Matrix4? Transform;
-		protected Mesh[]? Children;
 		protected int NumIndices;
 		protected int VertexBufferObject;
 		protected int IndexBufferObject;
@@ -22,12 +23,8 @@
 		{
 		}
 
-		public Mesh(string name, IShaderParameters? shaderParameters, Matrix4? transform, Mesh[]? children, float[]? vertices, int[]? indices)
+		public Mesh(IShaderParameters? shaderParameters, float[]? vertices, int[]? indices)
 		{
-			this.Name = name;
-			this.Transform = transform;
-			this.Children = children;
-
 			if (shaderParameters == null || vertices == null || indices == null)
 				return;
 
@@ -45,9 +42,14 @@
 			this.VertexArrayObject = shaderParameters.CreateVertexArrayObject();
 		}
 
-		public void Draw(Camera camera, Matrix4 world)
+		public void Draw(Camera camera, Matrix4 world, double frame)
 		{
-			var model = this.Transform != null ? this.Transform.Value * world : world;
+			var model = world;
+
+			if (this.TransformAnimation != null)
+				model = this.TransformAnimation[Math.Min((int) frame, this.TransformAnimation.Length - 1)] * model;
+			else if (this.Transform != null)
+				model = this.Transform.Value * model;
 
 			if (this.NumIndices > 0 && this.ShaderParameters != null)
 			{
@@ -64,7 +66,7 @@
 				return;
 
 			foreach (var child in this.Children)
-				child.Draw(camera, model);
+				child.Draw(camera, model, frame);
 		}
 
 		public virtual void Dispose()

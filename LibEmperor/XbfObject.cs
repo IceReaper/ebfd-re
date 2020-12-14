@@ -19,8 +19,8 @@ namespace LibEmperor
 		public readonly XbfObject[] Children;
 		public readonly double[] Transform = new double[4 * 4];
 		public readonly string Name;
-		public readonly XbfVertexAnimation VertexAnimation;
-		public readonly XbfKeyAnimation KeyAnimation;
+		public readonly XbfVertexAnimation? VertexAnimation;
+		public readonly XbfKeyAnimation? KeyAnimation;
 
 		public XbfObject(BinaryReader reader)
 		{
