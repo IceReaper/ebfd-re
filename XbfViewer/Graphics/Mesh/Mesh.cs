@@ -48,7 +48,6 @@
 
 			if (this.TransformAnimation != null)
 			{
-				// TODO we might need to interpolate between the last and first frame!
 				if (frame >= this.TransformAnimation.Length - 1)
 					model = this.TransformAnimation[^1] * model;
 				else

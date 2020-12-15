@@ -33,12 +33,12 @@ namespace XbfViewer.Graphics.Mesh
 
 		public void Update(float delta)
 		{
-			this.frame += delta * this.Speed;
+			this.frame = (this.frame + delta * this.Speed) % this.totalFrames;
 		}
 
 		public void Draw(Camera camera)
 		{
-			this.mesh.Draw(camera, this.World, this.frame % this.totalFrames);
+			this.mesh.Draw(camera, this.World, this.frame);
 		}
 	}
 }

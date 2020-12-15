@@ -26,7 +26,6 @@ namespace XbfViewer.Assets
 			// TODO: Some textures are using additional flags by prefixing their filenames:
 			// TODO: = => apply player color to 0000?? pixels
 			// TODO: ! => render additive
-
 			// TODO: % might be ""
 			// TODO: @ might be ""
 
@@ -43,7 +42,7 @@ namespace XbfViewer.Assets
 									}
 									catch (Exception)
 									{
-										return this.assetManager.Load<Texture>(this, "Textures/X_32.tga").Id;
+										return this.assetManager.Load<Texture>(this, "Textures/white.tga").Id;
 									}
 								}
 							)
@@ -116,8 +115,8 @@ namespace XbfViewer.Assets
 				Name = xbfObject.Name,
 				Transform = XbfMesh.BuildMatrix(xbfObject.Transform),
 				TransformAnimation =
-					xbfObject.ObjectAnimation != null && xbfObject.ObjectAnimation.Frames.Length > 0
-						? xbfObject.ObjectAnimation?.Frames.Select(XbfMesh.BuildMatrix).ToArray()
+					xbfObject.ObjectAnimation != null && xbfObject.ObjectAnimation.Frames.Count > 0
+						? XbfMesh.BuildAnimation(xbfObject.ObjectAnimation)
 						: null,
 				Children = allVertices.Keys
 					.Select(
@@ -130,6 +129,36 @@ namespace XbfViewer.Assets
 					.Concat(xbfObject.Children.Select(childXbfObject => XbfMesh.LoadXbfObject(childXbfObject, shader, textures)))
 					.ToArray(),
 			};
+		}
+
+		private static Matrix4[] BuildAnimation(XbfObjectAnimation xbfObjectAnimation)
+		{
+			var frames = new Matrix4[xbfObjectAnimation.Length];
+			var first = xbfObjectAnimation.Frames.Keys.Min();
+			var last = xbfObjectAnimation.Frames.Keys.Max();
+
+			var lastFrame = 0;
+
+			for (var i = 0; i < xbfObjectAnimation.Length; i++)
+			{
+				if (!xbfObjectAnimation.Frames.ContainsKey(i))
+					continue;
+
+				frames[i] = XbfMesh.BuildMatrix(xbfObjectAnimation.Frames[i]);
+
+				if (i == first)
+					for (var j = 0; j < i; j++)
+						frames[j] = frames[i];
+				else if (i > last)
+					frames[i] = frames[last];
+				else
+					for (; lastFrame + 1 < i; lastFrame++)
+						frames[lastFrame + 1] = frames[lastFrame] + (frames[i] - frames[lastFrame]) * (1f / (i - lastFrame));
+
+				lastFrame = i;
+			}
+
+			return frames;
 		}
 
 		private static Matrix4 BuildMatrix(double[] values)
