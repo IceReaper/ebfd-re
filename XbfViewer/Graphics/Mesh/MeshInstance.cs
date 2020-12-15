@@ -8,12 +8,12 @@ namespace XbfViewer.Graphics.Mesh
 	public class MeshInstance
 	{
 		private readonly Mesh mesh;
-		private readonly double totalFrames;
+		private readonly float totalFrames;
 
 		public Matrix4 World = Matrix4.Identity;
-		public double Speed = 1;
+		public float Speed = 1;
 
-		private double frame;
+		private float frame;
 
 		public MeshInstance(Mesh mesh)
 		{
@@ -31,9 +31,9 @@ namespace XbfViewer.Graphics.Mesh
 			return frames;
 		}
 
-		public void Update(double argsTime)
+		public void Update(float delta)
 		{
-			this.frame += argsTime * this.Speed;
+			this.frame += delta * this.Speed;
 		}
 
 		public void Draw(Camera camera)

@@ -42,12 +42,22 @@
 			this.VertexArrayObject = shaderParameters.CreateVertexArrayObject();
 		}
 
-		public void Draw(Camera camera, Matrix4 world, double frame)
+		public void Draw(Camera camera, Matrix4 world, float frame)
 		{
 			var model = world;
 
 			if (this.TransformAnimation != null)
-				model = this.TransformAnimation[Math.Min((int) frame, this.TransformAnimation.Length - 1)] * model;
+			{
+				// TODO we might need to interpolate between the last and first frame!
+				if (frame >= this.TransformAnimation.Length - 1)
+					model = this.TransformAnimation[^1] * model;
+				else
+				{
+					var lower = (int) frame;
+					var upper = lower + 1;
+					model = (this.TransformAnimation[lower] + (this.TransformAnimation[upper] - this.TransformAnimation[lower]) * (frame - lower)) * model;
+				}
+			}
 			else if (this.Transform != null)
 				model = this.Transform.Value * model;
 

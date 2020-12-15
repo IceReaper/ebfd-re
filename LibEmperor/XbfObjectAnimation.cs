@@ -3,21 +3,21 @@ namespace LibEmperor
 	using System;
 	using System.IO;
 
-	public class XbfKeyAnimation
+	public class XbfObjectAnimation
 	{
-		public readonly float[][] Animation;
+		public readonly float[][] Frames;
 
-		public XbfKeyAnimation(BinaryReader reader)
+		public XbfObjectAnimation(BinaryReader reader)
 		{
 			var lastFrame = reader.ReadInt32();
 			var usedFrames = reader.ReadInt32();
 
 			if (usedFrames == -1)
 			{
-				this.Animation = new float[lastFrame + 1][];
+				this.Frames = new float[lastFrame + 1][];
 
 				for (var i = 0; i <= lastFrame; i++)
-					this.Animation[i] = new[]
+					this.Frames[i] = new[]
 					{
 						reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(),
 						reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(),
@@ -26,10 +26,10 @@ namespace LibEmperor
 			}
 			else if (usedFrames == -2)
 			{
-				this.Animation = new float[lastFrame + 1][];
+				this.Frames = new float[lastFrame + 1][];
 
 				for (var i = 0; i <= lastFrame; i++)
-					this.Animation[i] = new[]
+					this.Frames[i] = new[]
 					{
 						reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0, reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0,
 						reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0, reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1
@@ -37,25 +37,32 @@ namespace LibEmperor
 			}
 			else if (usedFrames == -3)
 			{
-				// TODO it is possible, we need to use totalFrames here, and inject the ones defined by FrameId list.
-				this.Animation = new float[reader.ReadInt32()][];
+				var matrices = new float[reader.ReadInt32()][];
+				var frames = new short[lastFrame + 1];
 
 				for (var i = 0; i <= lastFrame; i++)
-					reader.ReadInt16(); // FrameId
+					frames[i] = reader.ReadInt16();
 
-				for (var i = 0; i < this.Animation.Length; i++)
-					this.Animation[i] = new[]
+				for (var i = 0; i < matrices.Length; i++)
+					matrices[i] = new[]
 					{
 						reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0, reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0,
 						reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0, reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1
 					};
+
+				this.Frames = new float[lastFrame + 1][];
+
+				for (var i = 0; i <= lastFrame; i++)
+					this.Frames[i] = matrices[frames[i]];
 			}
 			else
 			{
-				this.Animation = new float[usedFrames][];
+				this.Frames = new float[usedFrames][];
 
 				for (var i = 0; i < usedFrames; i++)
 				{
+					this.Frames[i] = new float[] {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+
 					// TODO assemble matrix.
 					var unk3 = reader.ReadInt16();
 					var flags = reader.ReadInt16();

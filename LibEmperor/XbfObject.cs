@@ -11,7 +11,7 @@ namespace LibEmperor
 			Unk1 = 1,
 			Unk2 = 2,
 			VertexAnimation = 4,
-			KeyAnimation = 8
+			ObjectAnimation = 8
 		}
 
 		public readonly XbfVertex[] Vertices;
@@ -20,7 +20,7 @@ namespace LibEmperor
 		public readonly double[] Transform = new double[4 * 4];
 		public readonly string Name;
 		public readonly XbfVertexAnimation? VertexAnimation;
-		public readonly XbfKeyAnimation? KeyAnimation;
+		public readonly XbfObjectAnimation? ObjectAnimation;
 
 		public XbfObject(BinaryReader reader)
 		{
@@ -63,8 +63,8 @@ namespace LibEmperor
 			if ((flags & Flags.VertexAnimation) != 0)
 				this.VertexAnimation = new XbfVertexAnimation(reader);
 
-			if ((flags & Flags.KeyAnimation) != 0)
-				this.KeyAnimation = new XbfKeyAnimation(reader);
+			if ((flags & Flags.ObjectAnimation) != 0)
+				this.ObjectAnimation = new XbfObjectAnimation(reader);
 		}
 	}
 }

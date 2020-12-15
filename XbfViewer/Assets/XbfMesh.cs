@@ -102,7 +102,7 @@ namespace XbfViewer.Assets
 			{
 				Name = xbfObject.Name,
 				Transform = XbfMesh.BuildMatrix(xbfObject.Transform),
-				TransformAnimation = xbfObject.KeyAnimation?.Animation.Select(XbfMesh.BuildMatrix).ToArray(),
+				TransformAnimation = xbfObject.ObjectAnimation?.Frames.Select(XbfMesh.BuildMatrix).ToArray(),
 				Children = allVertices.Keys
 					.Select(
 						texture => new Mesh(

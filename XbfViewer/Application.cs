@@ -70,7 +70,7 @@ namespace XbfViewer
 			if (this.meshInstance != null)
 			{
 				this.meshInstance.World *= Matrix4.CreateRotationY((float) args.Time / 5);
-				this.meshInstance.Update(args.Time);
+				this.meshInstance.Update((float) args.Time);
 			}
 
 			if (this.KeyboardState.IsKeyPressed(Keys.Enter) || this.model == null)
