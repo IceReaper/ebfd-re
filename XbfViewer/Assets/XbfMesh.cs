@@ -115,7 +115,10 @@ namespace XbfViewer.Assets
 			{
 				Name = xbfObject.Name,
 				Transform = XbfMesh.BuildMatrix(xbfObject.Transform),
-				TransformAnimation = xbfObject.ObjectAnimation?.Frames.Select(XbfMesh.BuildMatrix).ToArray(),
+				TransformAnimation =
+					xbfObject.ObjectAnimation != null && xbfObject.ObjectAnimation.Frames.Length > 0
+						? xbfObject.ObjectAnimation?.Frames.Select(XbfMesh.BuildMatrix).ToArray()
+						: null,
 				Children = allVertices.Keys
 					.Select(
 						texture => new Mesh(
