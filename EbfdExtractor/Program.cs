@@ -73,8 +73,12 @@ namespace EbfdExtractor
 						{
 							// Developer leftover file backup
 						}
+						else if (type == "LOG")
+						{
+							// Developer leftover error logfile
+						}
 						else
-							throw new Exception("Unknown type!");
+							throw new Exception($"Unknown type {type} !");
 					}
 				}
 				else if (file.EndsWith(".BAG", StringComparison.OrdinalIgnoreCase))
