@@ -56,6 +56,9 @@
 			void main()
 			{
 				fColor = texture(uTexture, vUv);
+				
+				if (fColor.w == 0.0)
+					discard;
 			}
 		";
 

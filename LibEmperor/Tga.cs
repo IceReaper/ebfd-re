@@ -87,6 +87,18 @@ namespace LibEmperor
 
 				if (imageDescriptor >> 6 != 0x00)
 					throw new Exception("Unsupported ImageDescriptor");
+
+				if (pixelDepth == 8 && alphaBits != 0)
+					throw new Exception("Unsupported AlphaBits");
+
+				if (pixelDepth == 16 && alphaBits != 1)
+					throw new Exception("Unsupported AlphaBits");
+
+				if (pixelDepth == 24 && alphaBits != 0)
+					throw new Exception("Unsupported AlphaBits");
+
+				if (pixelDepth == 32 && alphaBits != 8)
+					throw new Exception("Unsupported AlphaBits");
 			}
 
 			this.Pixels = new byte[this.Width * this.Height * 4];
@@ -151,13 +163,17 @@ namespace LibEmperor
 			{
 				case 16:
 				{
-					var color16 = (reader.ReadByte() << 8) | reader.ReadByte();
+					var color16 = reader.ReadInt16();
 
 					return Tga.FlipRgb(
 						new[]
 						{
 							(byte) (((color16 >> 0) & 0x1f) * 0xff / 0x1f), (byte) (((color16 >> 5) & 0x1f) * 0xff / 0x1f),
-							(byte) (((color16 >> 10) & 0x1f) * 0xff / 0x1f), (byte) (((color16 >> 15) & 0x01) * 0xff)
+							(byte) (((color16 >> 10) & 0x1f) * 0xff / 0x1f),
+
+							// It seems the alpha value is not used here...
+							//(byte) ((color16 >> 15) * 0xff)
+							(byte) 0xff
 						}
 					);
 				}
@@ -169,7 +185,7 @@ namespace LibEmperor
 					return Tga.FlipRgb(new[] {reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte()});
 
 				default:
-					return Tga.FlipRgb(new byte[4]);
+					return new byte[4];
 			}
 		}
 
