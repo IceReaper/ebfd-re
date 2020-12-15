@@ -88,16 +88,19 @@ namespace LibEmperor
 				if (imageDescriptor >> 6 != 0x00)
 					throw new Exception("Unsupported ImageDescriptor");
 
-				if (pixelDepth == 8 && alphaBits != 0)
+				// TODO what does it mean when alphaBits are 8?
+				if (pixelDepth == 8 && alphaBits != 0 && alphaBits != 8)
 					throw new Exception("Unsupported AlphaBits");
 
-				if (pixelDepth == 16 && alphaBits != 1)
+				// TODO what does it mean when alphaBits are 0 or 1?
+				if (pixelDepth == 16 && alphaBits != 1 && alphaBits != 0)
 					throw new Exception("Unsupported AlphaBits");
 
 				if (pixelDepth == 24 && alphaBits != 0)
 					throw new Exception("Unsupported AlphaBits");
 
-				if (pixelDepth == 32 && alphaBits != 8)
+				// TODO what does it mean when alphaBits are 0?
+				if (pixelDepth == 32 && alphaBits != 8 && alphaBits != 0)
 					throw new Exception("Unsupported AlphaBits");
 			}
 
@@ -113,8 +116,8 @@ namespace LibEmperor
 
 			if (imageType == 0x0a)
 			{
-				var uncompressed = new byte[this.Width * this.Height * pixelDepth];
 				var bytesPerPixel = pixelDepth / 8;
+				var uncompressed = new byte[this.Width * this.Height * bytesPerPixel];
 
 				for (var i = 0; i < uncompressed.Length;)
 				{

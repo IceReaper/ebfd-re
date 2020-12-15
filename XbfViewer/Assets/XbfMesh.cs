@@ -34,7 +34,20 @@ namespace XbfViewer.Assets
 					xbfObject => XbfMesh.LoadXbfObject(
 						xbfObject,
 						this.assetManager.Load<XbfShader>(this),
-						xbf.Textures.Select(name => this.assetManager.Load<Texture>(this, $"Textures/{name}").Id).ToArray()
+						xbf.Textures.Select(
+								name =>
+								{
+									try
+									{
+										return this.assetManager.Load<Texture>(this, $"Textures/{name}").Id;
+									}
+									catch (Exception)
+									{
+										return this.assetManager.Load<Texture>(this, "Textures/X_32.tga").Id;
+									}
+								}
+							)
+							.ToArray()
 					)
 				)
 				.ToArray();
