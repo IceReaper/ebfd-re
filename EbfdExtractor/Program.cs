@@ -28,58 +28,7 @@ namespace EbfdExtractor
 					var rfh = new Rfh(File.OpenRead(file), File.OpenRead(file.Substring(0, file.Length - 1) + (file.EndsWith("H") ? "D" : "d")));
 
 					foreach (var rfhFile in rfh.Files)
-					{
-						var type = rfhFile.Path.Substring(rfhFile.Path.Length - 3).ToUpper();
-
-						if (type == "TXT" || type == "INI")
-							Program.Extract(outPath, rfhFile.Path, rfhFile.Read());
-						else if (type == "TGA")
-							Program.Extract(outPath, rfhFile.Path, rfhFile.Read());
-						else if (type == "XBF")
-							Program.Extract(outPath, rfhFile.Path, rfhFile.Read());
-						else if (type == "TOK")
-						{
-							// TODO Mission
-						}
-						else if (type == "MAP")
-						{
-							// TODO Font
-						}
-						else if (type == "LIT")
-						{
-							// TODO Map.Lights
-						}
-						else if (type == "INF")
-						{
-							// TODO Map.Info NOT a text file
-						}
-						else if (type == "DAT")
-						{
-							// TODO Map.??? shows terrain in hex editor
-						}
-						else if (type == "CPT")
-						{
-							// TODO Map.??? list with a width of 16 bytes
-						}
-						else if (type == "CPF")
-						{
-							// TODO Map.??? shows terrain in hex editor
-						}
-						else if (type == "XAF")
-						{
-							// Developer leftover uncompiled XBF
-						}
-						else if (type == "BAK")
-						{
-							// Developer leftover file backup
-						}
-						else if (type == "LOG")
-						{
-							// Developer leftover error logfile
-						}
-						else
-							throw new Exception($"Unknown type {type} !");
-					}
+						Program.Extract(outPath, rfhFile.Path, rfhFile.Read());
 				}
 				else if (file.EndsWith(".BAG", StringComparison.OrdinalIgnoreCase))
 				{
