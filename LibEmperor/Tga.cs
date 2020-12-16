@@ -90,7 +90,7 @@ namespace LibEmperor
 				if (pixelDepth == 8 && alphaBits != 0 && alphaBits != 8)
 					throw new Exception("Unsupported AlphaBits");
 
-				// TODO what does it mean when alphaBits are 0 or 1?
+				// TODO what does it mean when alphaBits are 0?
 				if (pixelDepth == 16 && alphaBits != 1 && alphaBits != 0)
 					throw new Exception("Unsupported AlphaBits");
 

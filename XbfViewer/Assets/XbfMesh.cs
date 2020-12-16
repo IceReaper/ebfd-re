@@ -79,7 +79,7 @@ namespace XbfViewer.Assets
 						new VertexPositionNormalUv(
 							XbfMesh.Convert(xbfObject.Vertices[triangle.Vertices[i]].Position),
 							XbfMesh.Convert(xbfObject.Vertices[triangle.Vertices[i]].Normal),
-							XbfMesh.Convert(triangle.UV[i]) * new Vector2(1, -1)
+							XbfMesh.Convert(triangle.Uv[i]) * new Vector2(1, -1)
 						)
 					);
 
