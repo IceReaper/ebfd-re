@@ -2,6 +2,7 @@ namespace LibEmperor
 {
 	using System;
 	using System.IO;
+	using System.Numerics;
 
 	public class XbfObject
 	{
@@ -17,7 +18,7 @@ namespace LibEmperor
 		public readonly XbfVertex[] Vertices;
 		public readonly XbfTriangle[] Triangles;
 		public readonly XbfObject[] Children;
-		public readonly double[] Transform = new double[4 * 4];
+		public readonly Matrix4x4 Transform;
 		public readonly string Name;
 		public readonly XbfVertexAnimation? VertexAnimation;
 		public readonly XbfObjectAnimation? ObjectAnimation;
@@ -34,8 +35,24 @@ namespace LibEmperor
 			this.Triangles = new XbfTriangle[reader.ReadInt32()];
 			this.Children = new XbfObject[reader.ReadInt32()];
 
-			for (var i = 0; i < this.Transform.Length; i++)
-				this.Transform[i] = reader.ReadDouble();
+			this.Transform = new Matrix4x4(
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble(),
+				(float) reader.ReadDouble()
+			);
 
 			this.Name = new string(reader.ReadChars(reader.ReadInt32())).Split('\0')[0];
 

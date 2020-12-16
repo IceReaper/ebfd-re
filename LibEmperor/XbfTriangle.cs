@@ -1,37 +1,27 @@
 namespace LibEmperor
 {
 	using System.IO;
+	using System.Numerics;
 
 	public class XbfTriangle
 	{
-		public readonly int Vertex1;
-		public readonly int Vertex2;
-		public readonly int Vertex3;
+		public readonly int[] Vertices;
 		public readonly int Texture;
-		public readonly float U1;
-		public readonly float V1;
-		public readonly float U2;
-		public readonly float V2;
-		public readonly float U3;
-		public readonly float V3;
+		public readonly Vector2[] UV;
 
 		public XbfTriangle(BinaryReader reader)
 		{
-			this.Vertex1 = reader.ReadInt32();
-			this.Vertex2 = reader.ReadInt32();
-			this.Vertex3 = reader.ReadInt32();
-
+			this.Vertices = new[] {reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32()};
 			this.Texture = reader.ReadInt32();
 
 			// TODO implement this! Bitmask?
 			reader.ReadInt32();
 
-			this.U1 = reader.ReadSingle();
-			this.V1 = reader.ReadSingle();
-			this.U2 = reader.ReadSingle();
-			this.V2 = reader.ReadSingle();
-			this.U3 = reader.ReadSingle();
-			this.V3 = reader.ReadSingle();
+			this.UV = new[]
+			{
+				new Vector2(reader.ReadSingle(), reader.ReadSingle()), new Vector2(reader.ReadSingle(), reader.ReadSingle()),
+				new Vector2(reader.ReadSingle(), reader.ReadSingle())
+			};
 		}
 	}
 }

@@ -4,20 +4,20 @@
 
 	public readonly struct VertexPositionNormalUv
 	{
-		public readonly Vector3 Position;
-		public readonly Vector3 Normal;
-		public readonly Vector2 Uv;
+		private readonly Vector3 position;
+		private readonly Vector3 normal;
+		private readonly Vector2 uv;
 
 		public VertexPositionNormalUv(Vector3 position, Vector3 normal, Vector2 uv)
 		{
-			this.Position = position;
-			this.Normal = normal;
-			this.Uv = uv;
+			this.position = position;
+			this.normal = normal;
+			this.uv = uv;
 		}
 
 		public float[] Pack()
 		{
-			return new[] {this.Position.X, this.Position.Y, this.Position.Z, this.Normal.X, this.Normal.Y, this.Normal.Z, this.Uv.X, this.Uv.Y};
+			return new[] {this.position.X, this.position.Y, this.position.Z, this.normal.X, this.normal.Y, this.normal.Z, this.uv.X, this.uv.Y};
 		}
 	}
 }

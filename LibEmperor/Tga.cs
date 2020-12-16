@@ -31,11 +31,9 @@ namespace LibEmperor
 			var colorMapLength = 0;
 			var colorMapEntrySize = 0;
 
+			// This is a custom tga format, as this imageType means originally "no image".
 			if (imageType == 0x00)
-			{
-				// This is a custom tga format, as this imageType means originally "no image".
 				reader.ReadBytes(3);
-			}
 			else
 			{
 				firstIndexEntry = reader.ReadUInt16();

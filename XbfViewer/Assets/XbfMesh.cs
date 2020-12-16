@@ -10,6 +10,9 @@ namespace XbfViewer.Assets
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
+	using System.Numerics;
+	using Vector2 = OpenTK.Mathematics.Vector2;
+	using Vector3 = OpenTK.Mathematics.Vector3;
 
 	public class XbfMesh : Mesh
 	{
@@ -71,41 +74,14 @@ namespace XbfViewer.Assets
 				var vertices = allVertices[triangle.Texture];
 				var indices = allIndices[triangle.Texture];
 
-				vertices.Add(
-					new VertexPositionNormalUv(
-						new Vector3(xbfObject.Vertices[triangle.Vertex1].X, xbfObject.Vertices[triangle.Vertex1].Y, xbfObject.Vertices[triangle.Vertex1].Z),
-						new Vector3(
-							xbfObject.Vertices[triangle.Vertex1].NormalX,
-							xbfObject.Vertices[triangle.Vertex1].NormalY,
-							xbfObject.Vertices[triangle.Vertex1].NormalZ
-						),
-						new Vector2(triangle.U1, 1 - triangle.V1)
-					)
-				);
-
-				vertices.Add(
-					new VertexPositionNormalUv(
-						new Vector3(xbfObject.Vertices[triangle.Vertex2].X, xbfObject.Vertices[triangle.Vertex2].Y, xbfObject.Vertices[triangle.Vertex2].Z),
-						new Vector3(
-							xbfObject.Vertices[triangle.Vertex2].NormalX,
-							xbfObject.Vertices[triangle.Vertex2].NormalY,
-							xbfObject.Vertices[triangle.Vertex2].NormalZ
-						),
-						new Vector2(triangle.U2, 1 - triangle.V2)
-					)
-				);
-
-				vertices.Add(
-					new VertexPositionNormalUv(
-						new Vector3(xbfObject.Vertices[triangle.Vertex3].X, xbfObject.Vertices[triangle.Vertex3].Y, xbfObject.Vertices[triangle.Vertex3].Z),
-						new Vector3(
-							xbfObject.Vertices[triangle.Vertex3].NormalX,
-							xbfObject.Vertices[triangle.Vertex3].NormalY,
-							xbfObject.Vertices[triangle.Vertex3].NormalZ
-						),
-						new Vector2(triangle.U3, 1 - triangle.V3)
-					)
-				);
+				for (var i = 0; i < 3; i++)
+					vertices.Add(
+						new VertexPositionNormalUv(
+							XbfMesh.Convert(xbfObject.Vertices[triangle.Vertices[i]].Position),
+							XbfMesh.Convert(xbfObject.Vertices[triangle.Vertices[i]].Normal),
+							XbfMesh.Convert(triangle.UV[i]) * new Vector2(1, -1)
+						)
+					);
 
 				indices.Add(new ShaderIndex(vertices.Count - 3, vertices.Count - 2, vertices.Count - 1));
 			}
@@ -113,7 +89,7 @@ namespace XbfViewer.Assets
 			return new Mesh(null, null, null)
 			{
 				Name = xbfObject.Name,
-				Transform = XbfMesh.BuildMatrix(xbfObject.Transform),
+				Transform = XbfMesh.Convert(xbfObject.Transform),
 				TransformAnimation =
 					xbfObject.ObjectAnimation != null && xbfObject.ObjectAnimation.Frames.Count > 0
 						? XbfMesh.BuildAnimation(xbfObject.ObjectAnimation)
@@ -144,7 +120,7 @@ namespace XbfViewer.Assets
 				if (!xbfObjectAnimation.Frames.ContainsKey(i))
 					continue;
 
-				frames[i] = XbfMesh.BuildMatrix(xbfObjectAnimation.Frames[i]);
+				frames[i] = XbfMesh.Convert(xbfObjectAnimation.Frames[i]);
 
 				if (i == first)
 					for (var j = 0; j < i; j++)
@@ -161,48 +137,19 @@ namespace XbfViewer.Assets
 			return frames;
 		}
 
-		private static Matrix4 BuildMatrix(double[] values)
+		private static Vector2 Convert(System.Numerics.Vector2 v)
 		{
-			return new(
-				(float) values[0],
-				(float) values[1],
-				(float) values[2],
-				(float) values[3],
-				(float) values[4],
-				(float) values[5],
-				(float) values[6],
-				(float) values[7],
-				(float) values[8],
-				(float) values[9],
-				(float) values[10],
-				(float) values[11],
-				(float) values[12],
-				(float) values[13],
-				(float) values[14],
-				(float) values[15]
-			);
+			return new(v.X, v.Y);
 		}
 
-		private static Matrix4 BuildMatrix(float[] values)
+		private static Vector3 Convert(System.Numerics.Vector3 v)
 		{
-			return new(
-				values[0],
-				values[1],
-				values[2],
-				values[3],
-				values[4],
-				values[5],
-				values[6],
-				values[7],
-				values[8],
-				values[9],
-				values[10],
-				values[11],
-				values[12],
-				values[13],
-				values[14],
-				values[15]
-			);
+			return new(v.X, v.Y, v.Z);
+		}
+
+		private static Matrix4 Convert(Matrix4x4 m)
+		{
+			return new(m.M11, m.M12, m.M13, m.M14, m.M21, m.M22, m.M23, m.M24, m.M31, m.M32, m.M33, m.M34, m.M41, m.M42, m.M43, m.M44);
 		}
 
 		public override void Dispose()
