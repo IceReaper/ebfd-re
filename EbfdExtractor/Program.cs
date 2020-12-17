@@ -44,7 +44,7 @@ namespace EbfdExtractor
 		{
 			var finalPath = Path.Combine(path, $"{name}");
 			Directory.CreateDirectory(Path.GetDirectoryName(finalPath)!);
-			using var writer = new BinaryWriter(File.OpenWrite(finalPath));
+			using var writer = new BinaryWriter(File.Open(finalPath, FileMode.Create));
 			writer.Write(bytes);
 		}
 	}

@@ -46,7 +46,7 @@
 		{
 			try
 			{
-				return File.OpenWrite(Path.Combine(this.path, path));
+				return File.Open(Path.Combine(this.path, path), FileMode.Create);
 			}
 			catch (Exception)
 			{

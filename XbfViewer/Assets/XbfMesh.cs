@@ -1,8 +1,8 @@
 namespace XbfViewer.Assets
 {
 	using FileSystem;
-	using Graphics;
 	using Graphics.Mesh;
+	using Graphics.Shaders;
 	using Graphics.Vertices;
 	using LibEmperor;
 	using OpenTK.Mathematics;
@@ -99,7 +99,7 @@ namespace XbfViewer.Assets
 						texture => new Mesh(
 							new XbfShader.XbfShaderParameters(shader) {Texture = textures[texture]},
 							allVertices[texture].Select(vertex => vertex.Pack()).SelectMany(v => v).ToArray(),
-							allIndices[texture].Select(index => new[] {index.I1, index.I2, index.I3}).SelectMany(i => i).ToArray()
+							allIndices[texture].Select(index => index.Pack()).SelectMany(i => i).ToArray()
 						)
 					)
 					.Concat(xbfObject.Children.Select(childXbfObject => XbfMesh.LoadXbfObject(childXbfObject, shader, textures)))

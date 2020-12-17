@@ -55,7 +55,7 @@ namespace XbfViewer
 
 			this.camera = new PerspectiveCamera
 			{
-				Size = new Vector2(this.Size.X, this.Size.Y), Direction = new Vector3(-1, -1, 1).Normalized(), Position = new Vector3(1, 1, -1) * 128
+				Size = new Vector2(this.Size.X, this.Size.Y), Direction = new Vector3(0, -1, 1).Normalized(), Position = new Vector3(0, 1, -1) * 128
 			};
 		}
 

@@ -35,7 +35,7 @@ namespace LibEmperor
 			this.length = reader.ReadInt32();
 			this.sampleRate = reader.ReadInt32();
 			this.flags = (Flags) reader.ReadInt32();
-			this.unk = reader.ReadInt32();
+			this.unk = reader.ReadInt32(); // formatFlags
 
 			if ((int) this.flags >> 6 != 0)
 				throw new Exception("Unknown flags!");
@@ -45,13 +45,13 @@ namespace LibEmperor
 
 		public byte[] Read()
 		{
+			this.reader.BaseStream.Position = this.offset;
+
 			if ((this.flags & Flags.Mp3) != 0)
 			{
 				// TODO formatFlags look like 2 shorts here.
 				// The first one is either 4 on ingame tracks or 112 on menu and score. Possibly loop offset information?
 				// The last one is always -13.
-
-				this.reader.BaseStream.Position = this.offset;
 
 				return this.reader.ReadBytes(this.length);
 			}
@@ -79,23 +79,46 @@ namespace LibEmperor
 			writer.Write(Encoding.ASCII.GetBytes("data"));
 			writer.Write(this.length * (compressed ? 4 : 1));
 
-			this.reader.BaseStream.Position = this.offset;
-
 			if (compressed)
 			{
-				for (var j = 0; j < this.length; j++)
+				var currentSample = 0;
+				var index = 0;
+
+				for (var i = 0; i < this.length; i++)
 				{
 					var value = this.reader.ReadByte();
-
-					// TODO sound is properly decompressed but has continuous noise.
-					writer.Write((short) (((value >> 4) & 0b1111) * this.unk));
-					writer.Write((short) (((value >> 0) & 0b1111) * this.unk));
+					writer.Write(BagEntry.Decode((byte) ((value & 0b00001111) >> 0), ref index, ref currentSample));
+					writer.Write(BagEntry.Decode((byte) ((value & 0b11110000) >> 4), ref index, ref currentSample));
 				}
 			}
 			else
 				writer.Write(this.reader.ReadBytes(this.length));
 
-			return stream.GetBuffer();
+			return stream.ToArray();
+		}
+
+		private static readonly int[] IndexTable = {-1, -1, -1, -1, 2, 4, 6, 8};
+
+		private static readonly int[] StepTable =
+		{
+			7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190,
+			209, 230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658, 724, 796, 876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066, 2272, 2499,
+			2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358, 5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899, 15289, 16818, 18500, 20350,
+			22385, 24623, 27086, 29794, 32767
+		};
+
+		private static short Decode(byte nibble, ref int index, ref int current)
+		{
+			var delta = nibble & 0b0111;
+			var diff = BagEntry.StepTable[index] * (2 * delta + 1) / 16;
+
+			if ((nibble & 0b1000) != 0)
+				diff = -diff;
+
+			current = Math.Clamp(current + diff, short.MinValue, short.MaxValue);
+			index = Math.Clamp(index + BagEntry.IndexTable[delta], 0, BagEntry.StepTable.Length - 1);
+
+			return (short) current;
 		}
 	}
 }
